@@ -8,16 +8,16 @@ cleanup() {
 }
 
 if [ -z "$MYSQL_ENV_MYSQL_HOST" ]; then echo "Error: MYSQL_ENV_MYSQL_HOST not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_USER" ]; then echo "Error: MYSQL_ENV_MYSQL_USER not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_DATABASE" ]; then echo "Error: MYSQL_ENV_MYSQL_DATABASE not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_PASSWORD" ]; then echo "Error: MYSQL_ENV_MYSQL_PASSWORD not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_USER" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_USER not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_NAME" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_NAME not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_PASSWORD" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_PASSWORD not set"; echo "Finished: FAILURE"; exit 1; fi
 
 if [ -n "$CLEANUP_OLDER_THAN" ]; then cleanup;  fi
 
 echo 'creating backup archive of /var/www/html'
-tar --create --gzip -vv --directory="/var/www/html/" --file="/backups/backup_`date '+%Y%m%d'`.tar.gz" "./"
+tar --create --gzip -vv --directory="/var/www/html/" --file="/backups/backup_`date '+%Y%m%d%H%M%S'`.tar.gz" "./"
 
 echo 'creating database dump'
-mysqldump -h $MYSQL_ENV_MYSQL_HOST --add-drop-table -u$MYSQL_ENV_MYSQL_USER -p $MYSQL_ENV_MYSQL_DATABASE --password=$MYSQL_ENV_MYSQL_PASSWORD | bzip2 -c > /backups/backup_`date '+%Y%m%d'`.sql.bz2
+mysqldump -h $MYSQL_ENV_MYSQL_HOST --add-drop-table -u$WORDPRESS_ENV_WORDPRESS_DB_USER -p $WORDPRESS_ENV_WORDPRESS_DB_NAME --password=$WORDPRESS_ENV_WORDPRESS_DB_PASSWORD | bzip2 -c > /backups/backup_`date '+%Y%m%d%H%M%S'`.sql.bz2
 
 echo 'Finished: SUCCESS'

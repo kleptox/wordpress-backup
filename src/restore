@@ -9,9 +9,9 @@ then
 fi
 
 if [ -z "$MYSQL_ENV_MYSQL_HOST" ]; then echo "Error: MYSQL_ENV_MYSQL_HOST not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_USER" ]; then echo "Error: MYSQL_ENV_MYSQL_USER not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_DATABASE" ]; then echo "Error: MYSQL_ENV_MYSQL_DATABASE not set"; echo "Finished: FAILURE"; exit 1; fi
-if [ -z "$MYSQL_ENV_MYSQL_PASSWORD" ]; then echo "Error: MYSQL_ENV_MYSQL_PASSWORD not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_USER" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_USER not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_NAME" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_NAME not set"; echo "Finished: FAILURE"; exit 1; fi
+if [ -z "$WORDPRESS_ENV_WORDPRESS_DB_PASSWORD" ]; then echo "Error: WORDPRESS_ENV_WORDPRESS_DB_PASSWORD not set"; echo "Finished: FAILURE"; exit 1; fi
 if [ -z "$MYSQL_PORT_3306_TCP_PORT" ]; then echo "Error: MYSQL_PORT_3306_TCP_PORT not set"; echo "Finished: FAILURE"; exit 1; fi
 
 if ! [[ $1 =~ ^[a-zA-Z0-9_-]+$ ]]
@@ -48,9 +48,9 @@ echo "restoring files from $FILES_ARCHIVE to /var/www/html"
 tar -xzf $FILES_ARCHIVE --directory="/var/www/html/"
 
 # update wp-config.php
-sed -i s/"define('DB_NAME', '.*');"/"define('DB_NAME', '$MYSQL_ENV_MYSQL_DATABASE');"/g /var/www/html/wp-config.php
-sed -i s/"define('DB_USER', '.*');"/"define('DB_USER', '$MYSQL_ENV_MYSQL_USER');"/g /var/www/html/wp-config.php
-sed -i s/"define('DB_PASSWORD', '.*');"/"define('DB_PASSWORD', '$MYSQL_ENV_MYSQL_PASSWORD');"/g /var/www/html/wp-config.php
+sed -i s/"define('DB_NAME', '.*');"/"define('DB_NAME', '$WORDPRESS_ENV_WORDPRESS_DB_NAME');"/g /var/www/html/wp-config.php
+sed -i s/"define('DB_USER', '.*');"/"define('DB_USER', '$WORDPRESS_ENV_WORDPRESS_DB_USER');"/g /var/www/html/wp-config.php
+sed -i s/"define('DB_PASSWORD', '.*');"/"define('DB_PASSWORD', '$WORDPRESS_ENV_WORDPRESS_DB_PASSWORD');"/g /var/www/html/wp-config.php
 sed -i s/"define('DB_HOST', '.*');"/"define('DB_HOST', '$MYSQL_ENV_MYSQL_HOST:$MYSQL_PORT_3306_TCP_PORT');"/g /var/www/html/wp-config.php
 
 # set correct file owner
@@ -58,6 +58,6 @@ chown -R www-data:www-data /var/www/html
 
 # restore database
 echo "restoring data from mysql dump file $SQL_ARCHIVE"
-bunzip2 < $SQL_ARCHIVE | mysql -u$MYSQL_ENV_MYSQL_USER -p $MYSQL_ENV_MYSQL_DATABASE -p$MYSQL_ENV_MYSQL_PASSWORD -h $MYSQL_ENV_MYSQL_HOST
+bunzip2 < $SQL_ARCHIVE | mysql -u$WORDPRESS_ENV_WORDPRESS_DB_USER -p $WORDPRESS_ENV_WORDPRESS_DB_NAME -p$WORDPRESS_ENV_WORDPRESS_DB_PASSWORD -h $MYSQL_ENV_MYSQL_HOST
 
 echo 'Finished: SUCCESS'
